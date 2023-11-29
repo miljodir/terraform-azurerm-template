@@ -35,4 +35,4 @@ jobs:
     permissions:
       contents: write
     with:
-      payload: ${{ github.event.client_payload }}
+      payload: ${{ toJson(github.event.client_payload) }}
