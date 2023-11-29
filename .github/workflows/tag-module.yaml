@@ -31,7 +31,7 @@ jobs:
 
   tag:
     if: github.event_name == 'repository_dispatch'
-    uses: miljodir/workflow-templates/.github/workflows/create-release.yaml@create-release/v1
+    uses: miljodir/workflow-templates/.github/workflows/create-release.yaml@remove-split #create-release/v1
     permissions:
       contents: write
     with:
