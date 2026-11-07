@@ -42,10 +42,10 @@ versions do not define the versions available to module consumers.
 - Data sources and nested modules that would need real lookups can be replaced
   with `override_data` / `override_module`.
 
-- When tests run, the module is the *root* module. Terraform then rejects
-  outputs that contain sensitive attributes unless they are marked
-  `sensitive = true` (consumers calling the module are not affected). Put
-  test-only override files in `tests/overrides/` named `*_override.tf`, e.g.
+- When tests run, the module is the *root* module. Terraform rejects outputs
+  that expose sensitive attributes unless they are marked `sensitive = true`
+  (consumers calling the module are not affected). If this prevents testing,
+  optional `*_override.tf` files can mark those outputs sensitive, for example:
 
   ```hcl
   output "storage_account" {
@@ -53,8 +53,13 @@ versions do not define the versions available to module consumers.
   }
   ```
 
-  CI copies them into the module root before testing. Terraform validates the
-  original outputs first; OpenTofu validates with the test-only overrides.
+  Overrides are opt-in: the shared workflow caller must set its
+  `test-override-directory` input (for example, `tests/overrides`). This
+  template's caller does not set that input, so it does not apply output
+  overrides. When enabled, the shared workflow copies the files into a
+  disposable module copy, not over files in your checkout. Terraform validates
+  the original outputs before applying the overrides; OpenTofu validates with
+  the overrides.
 
 These are unit-style tests: they verify how the module turns inputs into
 resource configuration. They do not prove that Azure accepts the configuration;
@@ -125,8 +130,6 @@ The examples above use Windows path separators. In Bash, Linux, and macOS
 terminals, use `tests/module.tftest.hcl` in both `-filter` arguments instead.
 Filtered test commands should print `Success! 1 passed, 0 failed` for the
 starter smoke test.
-
-Remove the copied `*_override.tf` files afterwards (they are git-ignored).
 
 If the module references internal modules over SSH, you need SSH access to
 GitHub for `terraform init` to download them.
