@@ -20,6 +20,10 @@ engine, and requires at least one test run to pass:
 | `init -backend=false` and `validate` | Syntax, types and references are valid |
 | `test` | Module behaviour (defaults, wiring, validation) |
 
+Some CLI versions can exit successfully when a test filter matches no files.
+That is not a passing test: confirm the output reports at least one passed run.
+The shared workflow enforces this for CI.
+
 The testing scaffold does not add a root `required_version` or provider version
 constraint. Keep compatibility ranges specific to each module; the CI tool
 versions do not define the versions available to module consumers.
@@ -105,7 +109,7 @@ terraform init -backend=false
 terraform validate
 terraform test            # all tests
 terraform test -verbose   # include plan output
-terraform test -filter=tests/defaults.tftest.hcl
+terraform test -filter=tests\module.tftest.hcl
 ```
 
 The equivalent commands for OpenTofu use `tofu`:
@@ -114,7 +118,13 @@ The equivalent commands for OpenTofu use `tofu`:
 tofu init -backend=false
 tofu validate
 tofu test
+tofu test -filter=tests\module.tftest.hcl
 ```
+
+The examples above use Windows path separators. In Bash, Linux, and macOS
+terminals, use `tests/module.tftest.hcl` in both `-filter` arguments instead.
+Filtered test commands should print `Success! 1 passed, 0 failed` for the
+starter smoke test.
 
 Remove the copied `*_override.tf` files afterwards (they are git-ignored).
 
