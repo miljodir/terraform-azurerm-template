@@ -1,16 +1,22 @@
 # Testing
 
 This module is tested with the native [`terraform test`](https://developer.hashicorp.com/terraform/language/tests)
-framework. Tests run automatically in GitHub Actions on every pull request to
-`main` (see `.github/workflows/terraform-test.yaml`).
+framework using both Terraform and OpenTofu. Tests run automatically in
+GitHub Actions on pull requests to any target branch and pushes to `main`
+(see `.github/workflows/terraform-test.yaml`).
 
 ## What runs in CI
 
-| Job      | Command                              | Purpose                                         |
-| -------- | ------------------------------------ | ----------------------------------------------- |
-| Format   | `terraform fmt -check -recursive`    | Consistent formatting                           |
-| Validate | `terraform init` + `terraform validate` | Syntax, types and references are valid      |
-| Test     | `terraform test`                     | Module behaviour (defaults, wiring, validation) |
+The caller workflow uses the versioned shared workflow
+[`miljodir/workflow-templates/.github/workflows/terraform-test.yaml@terraform-test/v0`](https://github.com/miljodir/workflow-templates/blob/terraform-test/v0/.github/workflows/terraform-test.yaml)
+with `engine: both`. It runs the following checks independently with each
+engine, and requires at least one test run to pass:
+
+| Commands | Purpose |
+| -------- | ------- |
+| `terraform` / `tofu fmt -check -recursive` | Consistent formatting |
+| `init -backend=false` and `validate` | Syntax, types and references are valid |
+| `test` | Module behaviour (defaults, wiring, validation) |
 
 ## How the tests work
 
@@ -38,7 +44,8 @@ framework. Tests run automatically in GitHub Actions on every pull request to
   }
   ```
 
-  CI copies them into the module root right before `terraform test`.
+  CI copies them into the module root before testing. Terraform validates the
+  original outputs first; OpenTofu validates with the test-only overrides.
 
 These are unit-style tests: they verify how the module turns inputs into
 resource configuration. They do not prove that Azure accepts the configuration;
@@ -83,13 +90,25 @@ Guidelines:
 
 ## Running locally
 
-Requires Terraform >= 1.7.
+Terraform's mocked-provider test framework requires Terraform >= 1.7.
+OpenTofu has a compatible native test command; verify the module with each
+engine you intend to support. Passing on one engine does not guarantee
+compatibility with the other.
 
 ```sh
 terraform init -backend=false
+terraform validate
 terraform test            # all tests
 terraform test -verbose   # include plan output
 terraform test -filter=tests/defaults.tftest.hcl
+```
+
+The equivalent commands for OpenTofu use `tofu`:
+
+```sh
+tofu init -backend=false
+tofu validate
+tofu test
 ```
 
 Remove the copied `*_override.tf` files afterwards (they are git-ignored).
