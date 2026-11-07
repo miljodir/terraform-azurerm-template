@@ -25,3 +25,4 @@ jobs:
     uses: miljodir/workflow-templates/.github/workflows/terraform-test.yaml@terraform-test/v0
     with:
       engine: both
+      opentofu-version: "1.x"

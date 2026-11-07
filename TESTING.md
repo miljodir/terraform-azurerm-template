@@ -12,7 +12,8 @@ files change; the workflow can also be started manually
 The caller workflow uses the versioned shared workflow
 [`miljodir/workflow-templates/.github/workflows/terraform-test.yaml@terraform-test/v0`](https://github.com/miljodir/workflow-templates/blob/terraform-test/v0/.github/workflows/terraform-test.yaml)
 with `engine: both`. It runs the following checks independently with each
-engine, and requires at least one test run to pass:
+engine, using the latest stable Terraform 1.x and OpenTofu 1.x releases. It
+requires at least one test run to pass:
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -105,9 +106,9 @@ Guidelines:
 ## Running locally
 
 Terraform's mocked-provider test framework requires Terraform >= 1.7.
-OpenTofu has a compatible native test command; verify the module with each
-engine you intend to support. Passing on one engine does not guarantee
-compatibility with the other.
+OpenTofu has a compatible native test command; CI tracks the latest stable
+OpenTofu 1.x release. Verify the module with each engine you intend to support.
+Passing on one engine does not guarantee compatibility with the other.
 
 ```sh
 terraform init -backend=false
