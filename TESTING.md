@@ -114,22 +114,33 @@ terraform init -backend=false
 terraform validate
 terraform test            # all tests
 terraform test -verbose   # include plan output
-terraform test -filter=tests\module.tftest.hcl
+filter='tests/module.tftest.hcl'
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) filter='tests\module.tftest.hcl' ;;
+esac
+terraform test "-filter=$filter"
 ```
 
-The equivalent commands for OpenTofu use `tofu`:
+In the Bash example above, the filter is quoted when passed to the CLI.
+Git Bash on Windows uses Windows path separators for the native Windows
+Terraform and OpenTofu executables; Linux and macOS use forward slashes. To
+run the same filtered test with OpenTofu, use:
 
 ```sh
 tofu init -backend=false
 tofu validate
 tofu test
-tofu test -filter=tests\module.tftest.hcl
+filter='tests/module.tftest.hcl'
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) filter='tests\module.tftest.hcl' ;;
+esac
+tofu test "-filter=$filter"
 ```
 
-The examples above use Windows path separators. In Bash, Linux, and macOS
-terminals, use `tests/module.tftest.hcl` in both `-filter` arguments instead.
-Filtered test commands should print `Success! 1 passed, 0 failed` for the
-starter smoke test.
+For either filtered command, confirm the output reports
+`Success! 1 passed, 0 failed` for this starter smoke test. A successful exit
+with zero passed runs means the filter did not match and is **not a passing
+test**.
 
 If the module references internal modules over SSH, you need SSH access to
 GitHub for `terraform init` to download them.
