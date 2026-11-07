@@ -4,4 +4,4 @@ Template file for creating public terraform modules which can be pushed to the T
 ## Testing
 
 Modules created from this template are tested with Terraform and OpenTofu in GitHub Actions on pull requests to any target branch and pushes to `main`.
-The workflow calls the shared workflow in [miljodir/workflow-templates](https://github.com/miljodir/workflow-templates). Tests live in `tests/` and use mocked providers, so they need no Azure credentials. See [TESTING.md](TESTING.md).
+The workflow calls the shared workflow in [miljodir/workflow-templates](https://github.com/miljodir/workflow-templates). The starter smoke test needs no provider; tests that need one can use mocks and avoid Azure credentials. See [TESTING.md](TESTING.md).

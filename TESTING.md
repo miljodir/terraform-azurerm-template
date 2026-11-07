@@ -18,16 +18,19 @@ engine, and requires at least one test run to pass:
 | `init -backend=false` and `validate` | Syntax, types and references are valid |
 | `test` | Module behaviour (defaults, wiring, validation) |
 
+The testing scaffold does not add a root `required_version` or provider version
+constraint. Keep compatibility ranges specific to each module; the CI tool
+versions do not define the versions available to module consumers.
+
 ## How the tests work
 
 - Test files live in `tests/` and end in `.tftest.hcl`.
-- Every test file declares `mock_provider` blocks. Mocked providers never call
-  Azure: no credentials are needed and **no real resources are created**.
-  Resource attributes that Azure would compute (for example `id`) get generated
-  fake values.
-- Each `run` block plans (`command = plan`) or "applies" against the mocks
-  (`command = apply`) with a set of input variables, then checks the result with
-  `assert` blocks.
+- The starter smoke test needs no provider. When a test uses a provider, declare
+  it with `mock_provider`; mocked providers never call Azure, need no credentials,
+  and **do not create real resources**. Resource attributes Azure would compute
+  (for example `id`) get generated fake values.
+- Each `run` block plans (`command = plan`) or applies (`command = apply`) with
+  its input variables, then checks the result with `assert` blocks.
 - Input validation is tested with `expect_failures`, which passes only when the
   listed variable validation or precondition fails.
 - Data sources and nested modules that would need real lookups can be replaced
